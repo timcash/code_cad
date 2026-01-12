@@ -1,0 +1,19 @@
+{
+  "name": "code_cad",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "bun test/test.ts",
+    "start": "bun start.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.5"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "puppeteer": "^24.34.0"
+  }
+}

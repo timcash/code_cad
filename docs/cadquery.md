@@ -1,11 +1,4 @@
-# CadQuery Examples Research
-
-This file documents the process of finding CadQuery examples.
-
 ## Web Search
-
-I performed a web search for "cadquery examples" and found several promising links. The official documentation on `readthedocs.io` seems like the best place to start.
-
 - [CadQuery Documentation Examples](https://cadquery.readthedocs.io/en/latest/examples.html)
 - [CadQuery QuickStart](https://cadquery.readthedocs.io/en/latest/quickstart.html)
 - YouTube tutorials

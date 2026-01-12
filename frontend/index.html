@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code CAD - Python Powered</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #111;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: #eee;
+        }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+
+        /* UI Panel */
+        #ui-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 320px;
+            background: rgba(20, 20, 20, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+            z-index: 10;
+        }
+
+        /* Scrollbar */
+        #ui-panel::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #ui-panel::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+            background: linear-gradient(90deg, #00ff88, #00ccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        label {
+            font-size: 0.85rem;
+            color: #aaa;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .value-display {
+            color: #fff;
+            font-family: monospace;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #00ff88;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+
+        input[type="range"]::-webkit-slider-thumb:active {
+            transform: scale(0.95);
+            background: #00ccff;
+        }
+
+        button#btn-download {
+            margin-top: 12px;
+            padding: 12px;
+            background: linear-gradient(90deg, #00ff88, #00ccff);
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #111;
+            font-size: 0.95rem;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+
+        button#btn-download:hover {
+            opacity: 0.9;
+        }
+
+        button#btn-download:active {
+            transform: scale(0.98);
+        }
+
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 18px;
+            font-weight: 500;
+            color: #00ff88;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 12px 24px;
+            border-radius: 30px;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            z-index: 20;
+        }
+
+        #loading.visible {
+            opacity: 1;
+        }
+
+        .api-error {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ff4444;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            z-index: 20;
+        }
+    </style>
+    <!-- Import ImportMap for three -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div id="canvas-container"></div>
+
+    <div id="ui-panel">
+        <h1>Gear Generator</h1>
+
+        <div class="control-group">
+            <label>Outer Diameter <span id="val-outer_diameter" class="value-display">80</span></label>
+            <input type="range" id="inp-outer_diameter" min="40" max="200" value="80">
+        </div>
+
+        <div class="control-group">
+            <label>Inner Diameter <span id="val-inner_diameter" class="value-display">20</span></label>
+            <input type="range" id="inp-inner_diameter" min="5" max="50" value="20">
+        </div>
+
+        <div class="control-group">
+            <label>Thickness <span id="val-thickness" class="value-display">8</span></label>
+            <input type="range" id="inp-thickness" min="2" max="50" value="8">
+        </div>
+
+        <div class="control-group">
+            <label>Tooth Height <span id="val-tooth_height" class="value-display">6</span></label>
+            <input type="range" id="inp-tooth_height" min="1" max="20" value="6">
+        </div>
+
+        <div class="control-group">
+            <label>Tooth Width <span id="val-tooth_width" class="value-display">4</span></label>
+            <input type="range" id="inp-tooth_width" min="1" max="20" value="4">
+        </div>
+
+        <div class="control-group">
+            <label>Num Teeth <span id="val-num_teeth" class="value-display">20</span></label>
+            <input type="range" id="inp-num_teeth" min="5" max="100" step="1" value="20">
+        </div>
+
+        <div class="control-group">
+            <label>Mounting Holes <span id="val-num_mounting_holes" class="value-display">4</span></label>
+            <input type="range" id="inp-num_mounting_holes" min="0" max="12" step="1" value="4">
+        </div>
+
+        <div class="control-group">
+            <label>Hole Diameter <span id="val-mounting_hole_diameter" class="value-display">6</span></label>
+            <input type="range" id="inp-mounting_hole_diameter" min="2" max="20" value="6">
+        </div>
+
+        <button id="btn-download">Download STL</button>
+    </div>
+
+    <div id="loading">Generating Geometry...</div>
+    <div id="api-error" class="api-error"></div>
+    <script type="module" src="./app.js"></script>
+</body>
+
+</html>

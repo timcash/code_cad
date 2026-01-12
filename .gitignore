@@ -2,3 +2,9 @@
 # pixi environments
 .pixi
 *.egg-info
+chrome-debug-data
+logs
+node_modules
+__pycache__
+screenshots
+
